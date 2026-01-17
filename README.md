@@ -5,11 +5,11 @@ A modern iOS app template with SwiftUI and auto-generated API client for use wit
 ## Features
 
 - **SwiftUI** - Modern declarative UI framework
-- **Swift 5.9+** - Latest Swift with async/await
+- **Swift 6.0** - Latest Swift with async/await and strict concurrency
 - **URLSession API Client** - Type-safe networking
 - **Token Management** - JWT auth with refresh
 - **MVVM Architecture** - Clean separation of concerns
-- **iOS 17+ / macOS 14+** - Latest platform features
+- **iOS 18+ / macOS 15+** - Latest platform features (ready for iOS 26)
 
 ## Project Structure
 
@@ -86,9 +86,9 @@ Works with:
 
 ## Requirements
 
-- Xcode 15+
-- iOS 17+ / macOS 14+
-- Swift 5.9+
+- Xcode 16+
+- iOS 18+ / macOS 15+
+- Swift 6.0+
 
 ## License
 
