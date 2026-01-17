@@ -9,7 +9,7 @@ A modern iOS app template with SwiftUI and auto-generated API client for use wit
 - **URLSession API Client** - Type-safe networking
 - **Token Management** - JWT auth with refresh
 - **MVVM Architecture** - Clean separation of concerns
-- **iOS 18+ / macOS 15+** - Latest platform features (ready for iOS 26)
+- **iOS 26 / macOS 26** - Latest platform features
 
 ## Project Structure
 
@@ -86,8 +86,8 @@ Works with:
 
 ## Requirements
 
-- Xcode 16+
-- iOS 18+ / macOS 15+
+- Xcode 26+
+- iOS 26 / macOS 26
 - Swift 6.0+
 
 ## License
