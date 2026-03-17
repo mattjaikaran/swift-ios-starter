@@ -7,6 +7,7 @@ struct RegisterView: View {
     @State private var username = ""
     @State private var password = ""
     @State private var confirmPassword = ""
+    @State private var showError = false
 
     var isFormValid: Bool {
         !email.isEmpty && !username.isEmpty && !password.isEmpty && password == confirmPassword
@@ -47,12 +48,6 @@ struct RegisterView: View {
                         .font(.caption)
                 }
 
-                if let error = authViewModel.error {
-                    Text(error)
-                        .foregroundColor(.red)
-                        .font(.caption)
-                }
-
                 Button {
                     Task {
                         await authViewModel.register(
@@ -60,6 +55,9 @@ struct RegisterView: View {
                             username: username,
                             password: password
                         )
+                        if authViewModel.error != nil {
+                            showError = true
+                        }
                     }
                 } label: {
                     if authViewModel.isLoading {
@@ -79,6 +77,11 @@ struct RegisterView: View {
             Spacer()
         }
         .padding(.top, 40)
+        .alert("Registration Failed", isPresented: $showError) {
+            Button("OK") { authViewModel.error = nil }
+        } message: {
+            Text(authViewModel.error ?? "An unknown error occurred.")
+        }
     }
 }
 

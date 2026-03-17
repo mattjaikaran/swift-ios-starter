@@ -2,11 +2,11 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
+    @State private var showError = false
 
     var body: some View {
         NavigationStack {
             List {
-                // Profile header
                 if let user = authViewModel.user {
                     Section {
                         HStack(spacing: 16) {
@@ -32,7 +32,6 @@ struct ProfileView: View {
                     }
                 }
 
-                // Account section
                 Section("Account") {
                     NavigationLink {
                         Text("Edit Profile")
@@ -47,7 +46,6 @@ struct ProfileView: View {
                     }
                 }
 
-                // Preferences
                 Section("Preferences") {
                     NavigationLink {
                         Text("Notifications")
@@ -62,7 +60,6 @@ struct ProfileView: View {
                     }
                 }
 
-                // Logout
                 Section {
                     Button(role: .destructive) {
                         Task {
@@ -74,6 +71,14 @@ struct ProfileView: View {
                 }
             }
             .navigationTitle("Profile")
+            .alert("Error", isPresented: $showError) {
+                Button("OK") { authViewModel.error = nil }
+            } message: {
+                Text(authViewModel.error ?? "An unknown error occurred.")
+            }
+            .onChange(of: authViewModel.error) {
+                showError = authViewModel.error != nil
+            }
         }
     }
 }

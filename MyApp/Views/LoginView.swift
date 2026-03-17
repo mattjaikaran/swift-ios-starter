@@ -5,6 +5,7 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var showRegister = false
+    @State private var showError = false
 
     var body: some View {
         NavigationStack {
@@ -36,15 +37,12 @@ struct LoginView: View {
                         .textFieldStyle(.roundedBorder)
                         .textContentType(.password)
 
-                    if let error = authViewModel.error {
-                        Text(error)
-                            .foregroundColor(.red)
-                            .font(.caption)
-                    }
-
                     Button {
                         Task {
                             await authViewModel.login(email: email, password: password)
+                            if authViewModel.error != nil {
+                                showError = true
+                            }
                         }
                     } label: {
                         if authViewModel.isLoading {
@@ -70,6 +68,11 @@ struct LoginView: View {
             }
             .navigationDestination(isPresented: $showRegister) {
                 RegisterView()
+            }
+            .alert("Sign In Failed", isPresented: $showError) {
+                Button("OK") { authViewModel.error = nil }
+            } message: {
+                Text(authViewModel.error ?? "An unknown error occurred.")
             }
         }
     }
