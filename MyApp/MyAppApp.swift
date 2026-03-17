@@ -5,6 +5,15 @@ import API
 struct MyAppApp: App {
     @StateObject private var authViewModel = AuthViewModel()
     @StateObject private var deepLinkHandler = DeepLinkHandler()
+    @AppStorage("appearance") private var appearance: String = "system"
+
+    var colorScheme: ColorScheme? {
+        switch appearance {
+        case "light": return .light
+        case "dark": return .dark
+        default: return nil
+        }
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -14,6 +23,7 @@ struct MyAppApp: App {
                 .onOpenURL { url in
                     deepLinkHandler.handle(url: url)
                 }
+                .preferredColorScheme(colorScheme)
                 #if os(macOS)
                 .frame(minWidth: 800, minHeight: 500)
                 #endif

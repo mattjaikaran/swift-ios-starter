@@ -1,4 +1,5 @@
 import SwiftUI
+import API
 
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -9,7 +10,7 @@ struct ProfileView: View {
             List {
                 if let user = authViewModel.user {
                     Section {
-                        HStack(spacing: 16) {
+                        HStack(spacing: AppTheme.Spacing.md) {
                             Circle()
                                 .fill(Color.accentColor.opacity(0.2))
                                 .frame(width: 60, height: 60)
@@ -20,7 +21,7 @@ struct ProfileView: View {
                                         .foregroundColor(.accentColor)
                                 }
 
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                                 Text("\(user.firstName) \(user.lastName)")
                                     .font(.headline)
                                 Text(user.email)
@@ -28,7 +29,7 @@ struct ProfileView: View {
                                     .foregroundColor(.secondary)
                             }
                         }
-                        .padding(.vertical, 8)
+                        .padding(.vertical, AppTheme.Spacing.sm)
                     }
                 }
 
