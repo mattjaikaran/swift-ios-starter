@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import API
 
 @main
@@ -24,6 +25,7 @@ struct MyAppApp: App {
                     deepLinkHandler.handle(url: url)
                 }
                 .preferredColorScheme(colorScheme)
+                .modelContainer(CacheService.shared.container)
                 #if os(macOS)
                 .frame(minWidth: 800, minHeight: 500)
                 #endif

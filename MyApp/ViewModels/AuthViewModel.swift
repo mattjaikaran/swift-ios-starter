@@ -13,6 +13,7 @@ class AuthViewModel: ObservableObject {
     private let client: APIClient
     private let authService: AuthService
     private let biometricAuth = BiometricAuth.shared
+    private let cacheService = CacheService.shared
 
     let environment: AppEnvironment
 
@@ -31,18 +32,34 @@ class AuthViewModel: ObservableObject {
         isCheckingAuth = true
         defer { isCheckingAuth = false }
 
+        // Show cached user immediately (no loading state)
+        if let cachedUser = cacheService.getCachedUser() {
+            self.user = cachedUser
+            self.isAuthenticated = true
+        }
+
         guard await client.isAuthenticated else {
+            // If no valid auth but we showed cached data, clear it
+            if user != nil {
+                user = nil
+                isAuthenticated = false
+            }
             AppLogger.debug("Auth state: authenticated=false (no token)", category: AppLogger.auth)
             return
         }
 
         do {
-            user = try await authService.getCurrentUser()
+            let freshUser = try await authService.getCurrentUser()
+            cacheService.cacheUser(freshUser)
+            user = freshUser
             isAuthenticated = true
             AppLogger.debug("Auth state: authenticated=true", category: AppLogger.auth)
         } catch {
-            isAuthenticated = false
-            AppLogger.debug("Auth state: authenticated=false (check failed)", category: AppLogger.auth)
+            // If we already have a cached user, keep showing it
+            if user == nil {
+                isAuthenticated = false
+            }
+            AppLogger.debug("Auth state: authenticated=\(isAuthenticated) (check failed)", category: AppLogger.auth)
         }
     }
 
@@ -51,7 +68,9 @@ class AuthViewModel: ObservableObject {
         error = nil
 
         do {
-            user = try await authService.login(email: email, password: password)
+            let loggedInUser = try await authService.login(email: email, password: password)
+            cacheService.cacheUser(loggedInUser)
+            user = loggedInUser
             isAuthenticated = true
         } catch let apiError as APIError {
             error = apiError.localizedDescription
@@ -85,6 +104,7 @@ class AuthViewModel: ObservableObject {
 
     func logout() async {
         await authService.logout()
+        cacheService.clearAll()
         user = nil
         isAuthenticated = false
     }
@@ -94,7 +114,9 @@ class AuthViewModel: ObservableObject {
         error = nil
 
         do {
-            user = try await authService.updateProfile(firstName: firstName, lastName: lastName)
+            let updatedUser = try await authService.updateProfile(firstName: firstName, lastName: lastName)
+            cacheService.cacheUser(updatedUser)
+            user = updatedUser
         } catch let apiError as APIError {
             error = apiError.localizedDescription
         } catch {
