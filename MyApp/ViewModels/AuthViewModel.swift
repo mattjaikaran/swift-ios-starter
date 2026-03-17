@@ -5,6 +5,7 @@ import API
 class AuthViewModel: ObservableObject {
     @Published var user: User?
     @Published var isLoading = false
+    @Published var isCheckingAuth = true
     @Published var error: String?
     @Published var isAuthenticated = false
 
@@ -20,6 +21,9 @@ class AuthViewModel: ObservableObject {
     }
 
     func checkAuth() async {
+        isCheckingAuth = true
+        defer { isCheckingAuth = false }
+
         guard await client.isAuthenticated else { return }
 
         do {
