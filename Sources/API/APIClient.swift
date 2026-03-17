@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 /// API error types
 public enum APIError: Error, LocalizedError {
@@ -200,23 +201,40 @@ public actor APIClient {
             throw APIError.offline
         }
 
-        let (data, response) = try await session.data(for: request)
+        let method = request.httpMethod ?? "?"
+        let url = request.url?.absoluteString ?? "unknown"
+        AppLogger.debug("→ \(method) \(url)", category: AppLogger.api)
+
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch {
+            AppLogger.error("Request failed: \(error.localizedDescription)", category: AppLogger.api)
+            throw APIError.networkError(error)
+        }
 
         guard let httpResponse = response as? HTTPURLResponse else {
+            AppLogger.error("Invalid response type for \(url)", category: AppLogger.api)
             throw APIError.networkError(URLError(.badServerResponse))
         }
 
-        switch httpResponse.statusCode {
+        let statusCode = httpResponse.statusCode
+        AppLogger.debug("← \(statusCode) \(url)", category: AppLogger.api)
+
+        switch statusCode {
         case 200...299:
             do {
                 return try decoder.decode(T.self, from: data)
             } catch {
+                AppLogger.error("Decoding failed for \(url): \(error.localizedDescription)", category: AppLogger.api)
                 throw APIError.decodingError(error)
             }
         case 401:
+            AppLogger.warning("Unauthorized response for \(url)", category: AppLogger.api)
             // Don't retry if this is already a retry or a refresh request
             if !isRetry, try await attemptTokenRefresh() {
-                // Rebuild request with new access token
+                AppLogger.info("Token refreshed, retrying request", category: AppLogger.api)
                 var retryRequest = request
                 if let token = tokenStorage.accessToken {
                     retryRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -227,10 +245,12 @@ public actor APIClient {
         case 404:
             throw APIError.notFound
         case 500...599:
+            AppLogger.error("Server error \(statusCode) for \(url)", category: AppLogger.api)
             throw APIError.serverError
         default:
             let message = try? decoder.decode(ErrorResponse.self, from: data).message
-            throw APIError.httpError(statusCode: httpResponse.statusCode, message: message)
+            AppLogger.error("HTTP \(statusCode) for \(url): \(message ?? "no message")", category: AppLogger.api)
+            throw APIError.httpError(statusCode: statusCode, message: message)
         }
     }
 

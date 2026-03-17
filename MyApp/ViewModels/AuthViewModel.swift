@@ -27,16 +27,22 @@ class AuthViewModel: ObservableObject {
     }
 
     func checkAuth() async {
+        AppLogger.debug("Auth check started", category: AppLogger.auth)
         isCheckingAuth = true
         defer { isCheckingAuth = false }
 
-        guard await client.isAuthenticated else { return }
+        guard await client.isAuthenticated else {
+            AppLogger.debug("Auth state: authenticated=false (no token)", category: AppLogger.auth)
+            return
+        }
 
         do {
             user = try await authService.getCurrentUser()
             isAuthenticated = true
+            AppLogger.debug("Auth state: authenticated=true", category: AppLogger.auth)
         } catch {
             isAuthenticated = false
+            AppLogger.debug("Auth state: authenticated=false (check failed)", category: AppLogger.auth)
         }
     }
 
