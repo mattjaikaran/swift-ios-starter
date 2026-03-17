@@ -1,4 +1,5 @@
 import SwiftUI
+import API
 
 struct DashboardView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -14,9 +15,9 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
                     if let user = authViewModel.user {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                             Text("Welcome back,")
                                 .font(.headline)
                                 .foregroundColor(.secondary)
@@ -26,7 +27,7 @@ struct DashboardView: View {
                         }
                     }
 
-                    LazyVGrid(columns: gridColumns, spacing: 16) {
+                    LazyVGrid(columns: gridColumns, spacing: AppTheme.Spacing.md) {
                         StatCard(title: "Status", value: "Active", icon: "checkmark.circle.fill", color: .green)
                         StatCard(title: "Member Since", value: formattedDate, icon: "calendar", color: .blue)
                     }
@@ -62,7 +63,7 @@ struct StatCard: View {
     let color: Color
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
             HStack {
                 Image(systemName: icon)
                     .foregroundColor(color)
@@ -77,7 +78,7 @@ struct StatCard: View {
         }
         .padding()
         .background(.fill.tertiary)
-        .cornerRadius(12)
+        .cornerRadius(AppTheme.CornerRadius.md)
     }
 }
 
@@ -95,7 +96,7 @@ struct QuickActionButton: View {
             .frame(maxWidth: .infinity)
             .padding()
             .background(.fill.tertiary)
-            .cornerRadius(10)
+            .cornerRadius(AppTheme.CornerRadius.sm)
         }
         .buttonStyle(.plain)
     }

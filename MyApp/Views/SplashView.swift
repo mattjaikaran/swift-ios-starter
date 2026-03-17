@@ -1,8 +1,9 @@
 import SwiftUI
+import API
 
 struct SplashView: View {
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: AppTheme.Spacing.md) {
             Image(systemName: "app.fill")
                 .font(.system(size: 80))
                 .foregroundColor(.accentColor)
@@ -12,7 +13,7 @@ struct SplashView: View {
                 .fontWeight(.bold)
 
             ProgressView()
-                .padding(.top, 8)
+                .padding(.top, AppTheme.Spacing.sm)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

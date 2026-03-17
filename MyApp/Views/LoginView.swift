@@ -1,4 +1,5 @@
 import SwiftUI
+import API
 
 struct LoginView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -9,10 +10,10 @@ struct LoginView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
+            VStack(spacing: AppTheme.Spacing.lg) {
                 Spacer()
 
-                VStack(spacing: 8) {
+                VStack(spacing: AppTheme.Spacing.sm) {
                     Image(systemName: "app.fill")
                         .font(.system(size: 60))
                         .foregroundColor(.accentColor)
@@ -24,7 +25,7 @@ struct LoginView: View {
 
                 Spacer()
 
-                VStack(spacing: 16) {
+                VStack(spacing: AppTheme.Spacing.md) {
                     TextField("Email", text: $email)
                         .textFieldStyle(.roundedBorder)
                         .textContentType(.emailAddress)
@@ -73,7 +74,7 @@ struct LoginView: View {
                             systemImage: authViewModel.biometricName == "Face ID" ? "faceid" : "touchid"
                         )
                     }
-                    .padding(.top, 4)
+                    .padding(.top, AppTheme.Spacing.xs)
                 }
 
                 Button("Don't have an account? Sign Up") {
