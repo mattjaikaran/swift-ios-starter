@@ -59,6 +59,23 @@ struct LoginView: View {
                 .padding(.horizontal)
                 .frame(maxWidth: 400)
 
+                if authViewModel.isBiometricAvailable && authViewModel.biometricEnabled {
+                    Button {
+                        Task {
+                            let success = await authViewModel.authenticateWithBiometrics()
+                            if success {
+                                await authViewModel.checkAuth()
+                            }
+                        }
+                    } label: {
+                        Label(
+                            "Sign in with \(authViewModel.biometricName)",
+                            systemImage: authViewModel.biometricName == "Face ID" ? "faceid" : "touchid"
+                        )
+                    }
+                    .padding(.top, 4)
+                }
+
                 Button("Don't have an account? Sign Up") {
                     showRegister = true
                 }

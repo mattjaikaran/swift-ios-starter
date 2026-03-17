@@ -8,16 +8,22 @@ class AuthViewModel: ObservableObject {
     @Published var isCheckingAuth = true
     @Published var error: String?
     @Published var isAuthenticated = false
+    @Published var biometricEnabled = false
 
     private let client: APIClient
     private let authService: AuthService
+    private let biometricAuth = BiometricAuth.shared
 
     let environment: AppEnvironment
+
+    var isBiometricAvailable: Bool { biometricAuth.isAvailable }
+    var biometricName: String { biometricAuth.biometricName }
 
     init(environment: AppEnvironment = .current) {
         self.environment = environment
         self.client = APIClient(baseURL: environment.baseURL)
         self.authService = AuthService(client: client)
+        self.biometricEnabled = UserDefaults.standard.bool(forKey: "biometric_enabled")
     }
 
     func checkAuth() async {
@@ -90,5 +96,21 @@ class AuthViewModel: ObservableObject {
         }
 
         isLoading = false
+    }
+
+    // MARK: - Biometrics
+
+    func setBiometricEnabled(_ enabled: Bool) {
+        biometricEnabled = enabled
+        UserDefaults.standard.set(enabled, forKey: "biometric_enabled")
+    }
+
+    func authenticateWithBiometrics() async -> Bool {
+        guard biometricEnabled, biometricAuth.isAvailable else { return false }
+        do {
+            return try await biometricAuth.authenticate(reason: "Sign in to MyApp")
+        } catch {
+            return false
+        }
     }
 }

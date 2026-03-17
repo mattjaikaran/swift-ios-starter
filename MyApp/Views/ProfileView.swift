@@ -46,6 +46,17 @@ struct ProfileView: View {
                     }
                 }
 
+                Section("Security") {
+                    if authViewModel.isBiometricAvailable {
+                        Toggle(isOn: Binding(
+                            get: { authViewModel.biometricEnabled },
+                            set: { authViewModel.setBiometricEnabled($0) }
+                        )) {
+                            Label(authViewModel.biometricName, systemImage: authViewModel.biometricName == "Face ID" ? "faceid" : "touchid")
+                        }
+                    }
+                }
+
                 Section("Preferences") {
                     NavigationLink {
                         Text("Notifications")
