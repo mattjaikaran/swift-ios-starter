@@ -71,6 +71,21 @@ public actor AuthService {
         await client.clearTokens()
     }
 
+    /// Verify email with token
+    public func verifyEmail(token: String) async throws -> MessageResponse {
+        try await client.post("/auth/verify-email", body: VerifyEmailRequest(token: token))
+    }
+
+    /// Reset password with token
+    public func resetPassword(token: String, newPassword: String) async throws -> MessageResponse {
+        try await client.post("/auth/reset-password", body: ResetPasswordRequest(token: token, newPassword: newPassword))
+    }
+
+    /// Request a password reset email
+    public func requestPasswordReset(email: String) async throws -> MessageResponse {
+        try await client.post("/auth/forgot-password", body: ForgotPasswordRequest(email: email))
+    }
+
     /// Check if user is authenticated
     public var isAuthenticated: Bool {
         get async { await client.isAuthenticated }

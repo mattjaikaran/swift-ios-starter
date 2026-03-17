@@ -195,6 +195,34 @@ public struct Member: Codable, Identifiable, Sendable {
     }
 }
 
+// MARK: - Deep Link / Password Reset Models
+
+public struct VerifyEmailRequest: Codable, Sendable {
+    public let token: String
+
+    public init(token: String) {
+        self.token = token
+    }
+}
+
+public struct ResetPasswordRequest: Codable, Sendable {
+    public let token: String
+    public let newPassword: String
+
+    public init(token: String, newPassword: String) {
+        self.token = token
+        self.newPassword = newPassword
+    }
+}
+
+public struct ForgotPasswordRequest: Codable, Sendable {
+    public let email: String
+
+    public init(email: String) {
+        self.email = email
+    }
+}
+
 // MARK: - Generic Response Types
 
 public struct MessageResponse: Codable, Sendable {
