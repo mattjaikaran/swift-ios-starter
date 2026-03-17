@@ -77,8 +77,6 @@ public actor AuthService {
     }
 
     private func getRefreshToken() async -> String? {
-        // This would need access to token storage
-        // For now, return nil and handle in calling code
-        nil
+        await client.getRefreshToken()
     }
 }

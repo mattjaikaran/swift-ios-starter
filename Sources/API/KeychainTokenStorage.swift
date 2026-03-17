@@ -6,6 +6,7 @@ public class KeychainTokenStorage: TokenStorage {
     private let service: String
     private let accessTokenAccount = "access_token"
     private let refreshTokenAccount = "refresh_token"
+    private let tokenExpiresAtKey = "token_expires_at"
 
     public init(service: String = "com.myapp.auth") {
         self.service = service
@@ -33,9 +34,25 @@ public class KeychainTokenStorage: TokenStorage {
         }
     }
 
+    public var tokenExpiresAt: Date? {
+        get {
+            guard let isoString = read(account: tokenExpiresAtKey) else { return nil }
+            return ISO8601DateFormatter().date(from: isoString)
+        }
+        set {
+            if let value = newValue {
+                let isoString = ISO8601DateFormatter().string(from: value)
+                save(isoString, account: tokenExpiresAtKey)
+            } else {
+                delete(account: tokenExpiresAtKey)
+            }
+        }
+    }
+
     public func clearTokens() {
         delete(account: accessTokenAccount)
         delete(account: refreshTokenAccount)
+        delete(account: tokenExpiresAtKey)
     }
 
     // MARK: - Keychain Operations
