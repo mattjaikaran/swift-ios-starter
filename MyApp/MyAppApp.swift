@@ -1,4 +1,6 @@
 import SwiftUI
+import SwiftData
+import API
 
 @main
 struct MyAppApp: App {
@@ -8,6 +10,7 @@ struct MyAppApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(authViewModel)
+                .modelContainer(CacheService.shared.container)
                 #if os(macOS)
                 .frame(minWidth: 800, minHeight: 500)
                 #endif
