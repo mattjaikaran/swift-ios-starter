@@ -10,10 +10,23 @@ public actor AuthService {
 
     /// Login with email and password
     public func login(email: String, password: String) async throws -> User {
+        #if DEBUG
+        AppLogger.info("Login attempt for \(email)", category: AppLogger.auth)
+        #else
+        AppLogger.info("Login attempt", category: AppLogger.auth)
+        #endif
+
         let request = LoginRequest(email: email, password: password)
-        let tokens: TokenResponse = try await client.post("/auth/login", body: request)
-        await client.setTokens(access: tokens.accessToken, refresh: tokens.refreshToken)
-        return try await getCurrentUser()
+        do {
+            let tokens: TokenResponse = try await client.post("/auth/login", body: request)
+            await client.setTokens(access: tokens.accessToken, refresh: tokens.refreshToken)
+            let user = try await getCurrentUser()
+            AppLogger.info("Login successful", category: AppLogger.auth)
+            return user
+        } catch {
+            AppLogger.error("Login failed: \(error.localizedDescription)", category: AppLogger.auth)
+            throw error
+        }
     }
 
     /// Register a new user
@@ -24,6 +37,7 @@ public actor AuthService {
         firstName: String? = nil,
         lastName: String? = nil
     ) async throws -> User {
+        AppLogger.info("Registration attempt for username: \(username)", category: AppLogger.auth)
         let request = RegisterRequest(
             email: email,
             username: username,
@@ -31,7 +45,14 @@ public actor AuthService {
             firstName: firstName,
             lastName: lastName
         )
-        return try await client.post("/auth/register", body: request)
+        do {
+            let user: User = try await client.post("/auth/register", body: request)
+            AppLogger.info("Registration successful", category: AppLogger.auth)
+            return user
+        } catch {
+            AppLogger.error("Registration failed: \(error.localizedDescription)", category: AppLogger.auth)
+            throw error
+        }
     }
 
     /// Get current authenticated user
@@ -57,18 +78,27 @@ public actor AuthService {
 
     /// Refresh access token
     public func refreshToken() async throws {
+        AppLogger.debug("Token refresh attempt", category: AppLogger.auth)
         guard let refreshToken = await getRefreshToken() else {
+            AppLogger.warning("Token refresh failed: no refresh token available", category: AppLogger.auth)
             throw APIError.unauthorized
         }
 
         let request = RefreshTokenRequest(refreshToken: refreshToken)
-        let tokens: TokenResponse = try await client.post("/auth/refresh", body: request)
-        await client.setTokens(access: tokens.accessToken, refresh: tokens.refreshToken)
+        do {
+            let tokens: TokenResponse = try await client.post("/auth/refresh", body: request)
+            await client.setTokens(access: tokens.accessToken, refresh: tokens.refreshToken)
+            AppLogger.info("Token refresh successful", category: AppLogger.auth)
+        } catch {
+            AppLogger.error("Token refresh failed: \(error.localizedDescription)", category: AppLogger.auth)
+            throw error
+        }
     }
 
     /// Logout and clear tokens
     public func logout() async {
         await client.clearTokens()
+        AppLogger.info("User logged out", category: AppLogger.auth)
     }
 
     /// Check if user is authenticated
