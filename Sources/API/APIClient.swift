@@ -9,6 +9,7 @@ public enum APIError: Error, LocalizedError {
     case unauthorized
     case notFound
     case serverError
+    case offline
 
     public var errorDescription: String? {
         switch self {
@@ -26,6 +27,8 @@ public enum APIError: Error, LocalizedError {
             return "Resource not found"
         case .serverError:
             return "Server error - please try again later"
+        case .offline:
+            return "No internet connection. Please check your network and try again."
         }
     }
 }
@@ -170,6 +173,10 @@ public actor APIClient {
     }
 
     private func performRequest<T: Decodable>(_ request: URLRequest) async throws -> T {
+        if await !NetworkMonitor.shared.isConnected {
+            throw APIError.offline
+        }
+
         let (data, response) = try await session.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
