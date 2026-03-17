@@ -7,7 +7,7 @@ final class APIClientTests: XCTestCase {
 
     override func setUp() async throws {
         let url = URL(string: "https://api.example.com")!
-        client = APIClient(baseURL: url)
+        client = APIClient(baseURL: url, tokenStorage: DefaultTokenStorage())
     }
 
     override func tearDown() async throws {

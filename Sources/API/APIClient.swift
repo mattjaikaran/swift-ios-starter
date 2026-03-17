@@ -83,7 +83,7 @@ public actor APIClient {
     public init(
         baseURL: URL,
         session: URLSession = .shared,
-        tokenStorage: TokenStorage = DefaultTokenStorage()
+        tokenStorage: TokenStorage = KeychainTokenStorage()
     ) {
         self.baseURL = baseURL
         self.session = session
