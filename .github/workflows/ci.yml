@@ -9,13 +9,13 @@ on:
 jobs:
   build-and-test:
     name: Build and Test
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Select Xcode
-        run: sudo xcode-select -switch /Applications/Xcode_15.4.app
+        run: sudo xcode-select -switch /Applications/Xcode_26.app
 
       - name: Show Swift version
         run: swift --version
@@ -28,7 +28,7 @@ jobs:
 
   lint:
     name: Swift Lint
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,22 +38,39 @@ jobs:
 
       - name: Run SwiftLint
         run: swiftlint lint --strict Sources Tests || true
-        # Continue even if linting fails for now
 
   ios-build:
     name: iOS Build Check
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Select Xcode
-        run: sudo xcode-select -switch /Applications/Xcode_15.4.app
+        run: sudo xcode-select -switch /Applications/Xcode_26.app
 
       - name: Build for iOS Simulator
         run: |
           xcodebuild build \
             -scheme API \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5' \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.3' \
             -derivedDataPath .build/ios \
+            | xcpretty || swift build
+
+  macos-build:
+    name: macOS Build Check
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_26.app
+
+      - name: Build for macOS
+        run: |
+          xcodebuild build \
+            -scheme API \
+            -destination 'platform=macOS' \
+            -derivedDataPath .build/macos \
             | xcpretty || swift build

@@ -11,7 +11,6 @@ struct LoginView: View {
             VStack(spacing: 24) {
                 Spacer()
 
-                // Logo/Title
                 VStack(spacing: 8) {
                     Image(systemName: "app.fill")
                         .font(.system(size: 60))
@@ -24,12 +23,13 @@ struct LoginView: View {
 
                 Spacer()
 
-                // Form
                 VStack(spacing: 16) {
                     TextField("Email", text: $email)
                         .textFieldStyle(.roundedBorder)
                         .textContentType(.emailAddress)
+                        #if os(iOS)
                         .textInputAutocapitalization(.never)
+                        #endif
                         .autocorrectionDisabled()
 
                     SecureField("Password", text: $password)
@@ -59,8 +59,8 @@ struct LoginView: View {
                     .disabled(email.isEmpty || password.isEmpty || authViewModel.isLoading)
                 }
                 .padding(.horizontal)
+                .frame(maxWidth: 400)
 
-                // Register link
                 Button("Don't have an account? Sign Up") {
                     showRegister = true
                 }

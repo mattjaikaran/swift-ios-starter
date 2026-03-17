@@ -22,12 +22,16 @@ struct RegisterView: View {
                 TextField("Email", text: $email)
                     .textFieldStyle(.roundedBorder)
                     .textContentType(.emailAddress)
+                    #if os(iOS)
                     .textInputAutocapitalization(.never)
+                    #endif
 
                 TextField("Username", text: $username)
                     .textFieldStyle(.roundedBorder)
                     .textContentType(.username)
+                    #if os(iOS)
                     .textInputAutocapitalization(.never)
+                    #endif
 
                 SecureField("Password", text: $password)
                     .textFieldStyle(.roundedBorder)
@@ -70,6 +74,7 @@ struct RegisterView: View {
                 .disabled(!isFormValid || authViewModel.isLoading)
             }
             .padding(.horizontal)
+            .frame(maxWidth: 400)
 
             Spacer()
         }

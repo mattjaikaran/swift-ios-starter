@@ -6,7 +6,11 @@ struct ContentView: View {
     var body: some View {
         Group {
             if authViewModel.isAuthenticated {
+                #if os(macOS)
+                SidebarNavigationView()
+                #else
                 MainTabView()
+                #endif
             } else {
                 LoginView()
             }
