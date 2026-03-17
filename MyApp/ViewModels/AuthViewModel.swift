@@ -11,10 +11,11 @@ class AuthViewModel: ObservableObject {
     private let client: APIClient
     private let authService: AuthService
 
-    init() {
-        // Configure your API base URL
-        let baseURL = URL(string: "http://localhost:8000/api")!
-        self.client = APIClient(baseURL: baseURL)
+    let environment: AppEnvironment
+
+    init(environment: AppEnvironment = .current) {
+        self.environment = environment
+        self.client = APIClient(baseURL: environment.baseURL)
         self.authService = AuthService(client: client)
     }
 
